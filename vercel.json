@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/tool/(.*)",
+      "destination": "/api/proxy"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
+  ]
+}

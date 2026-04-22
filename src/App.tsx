@@ -2,7 +2,17 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Sparkles, AlertCircle, RefreshCw, Camera, Image as ImageIcon, Download } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+let aiClient: GoogleGenAI | null = null;
+function getAi() {
+  if (!aiClient) {
+    const key = process.env.GEMINI_API_KEY;
+    if (!key) {
+      throw new Error("请在您的 Vercel 环境变量中配置 GEMINI_API_KEY！");
+    }
+    aiClient = new GoogleGenAI({ apiKey: key });
+  }
+  return aiClient;
+}
 
 function parseBase64(dataUrl: string): [string, string] {
   const matches = dataUrl.match(/^data:(.+);base64,(.+)$/);
@@ -132,7 +142,7 @@ export default function App() {
       // Verify if pet is a cat or dog first
       const checkPrompt = `Is the subject in this image a real cat or a real dog? Respond with a JSON object containing a single boolean field "isCatOrDog" set to true if it is a real cat or dog, and false otherwise.`;
       
-      const checkResponse = await ai.models.generateContent({
+      const checkResponse = await getAi().models.generateContent({
         model: "gemini-2.5-flash",
         contents: {
           parts: [
@@ -167,7 +177,7 @@ export default function App() {
 
       for (let i = 0; i < prompts.length; i++) {
         try {
-            const resp = await ai.models.generateContent({
+            const resp = await getAi().models.generateContent({
             model: "gemini-3.1-flash-image-preview",
             contents: {
                 parts: [
