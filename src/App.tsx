@@ -24,7 +24,7 @@ export default function App() {
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>("1:1");
   const [error, setError] = useState<string | null>(null);
   const [integral, setIntegral] = useState<number | null>(null);
-  const [saasInfo, setSaasInfo] = useState<{userId: string, toolId: string} | null>(null);
+  const [saasInfo, setSaasInfo] = useState<{userId: string, toolId: string, context?: string, prompt?: string[]} | null>(null);
 
   useEffect(() => {
     const initSaaS = async (info: {userId: string, toolId: string}) => {
@@ -35,7 +35,7 @@ export default function App() {
           body: JSON.stringify(info)
         });
         const d = await res.json();
-        if (d.success && d.data?.user?.integral !== undefined) {
+        if (d.success !== false && d.data?.user?.integral !== undefined) {
           setIntegral(d.data.user.integral);
         }
       } catch(e) {
@@ -45,8 +45,12 @@ export default function App() {
 
     const handleMessage = (e: MessageEvent) => {
       if (e.data?.type === 'SAAS_INIT') {
-        const { userId, toolId } = e.data;
-        setSaasInfo({ userId, toolId });
+        const { userId, toolId, context, prompt } = e.data;
+        if (String(userId) === "null" || String(userId) === "undefined" || 
+            String(toolId) === "null" || String(toolId) === "undefined") {
+            return;
+        }
+        setSaasInfo({ userId, toolId, context, prompt });
         initSaaS({ userId, toolId });
       }
     };
@@ -94,11 +98,11 @@ export default function App() {
         const verifyRes = await fetch('/api/tool/verify', {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(saasInfo)
+          body: JSON.stringify({ userId: saasInfo.userId, toolId: saasInfo.toolId })
         });
         const vData = await verifyRes.json();
-        if (vData.success === false) {
-           setError(vData.message || "积分不足");
+        if (vData.success === false || vData.error) {
+           setError(vData.error || vData.message || "积分不足");
            setIsGenerating(false);
            return;
         }
@@ -154,9 +158,14 @@ export default function App() {
       const unifiedEnvironment = "ENVIRONMENT: The pet is sitting in a warm, cozy, and inviting indoor home setting, resting on a soft plush beige blanket or cushion. The beautifully blurred background features subtle warm wooden textures and soft glowing ambient light. Highly detailed, soft realistic warm indoor lighting.";
       const exactIdentity = "ABSOLUTE CRITICAL INSTRUCTION: THIS IS A VIRTUAL TRY-ON TASK. The pet in the final image MUST BE A PERFECT 100% COPY of the 'Reference Pet Image'. The pet's face, fur pattern, specific fur colors, spots, eye shape, eye color, nose shape, and bodily proportions must be 100% IDENTICAL. Treat the Reference Pet Image as a strict subject character. DO NOT alter even a single hair or whisker of the original pet. It must look exactly like the uploaded pet.";
       const exactClothing = "CRITICAL CLOTHING INSTRUCTION: You MUST perfectly duplicate the clothing item from the 'Reference Clothing Image'. Pay strict attention to the FABRIC TEXTURE, material, fluffiness, woven details, cut, structure, collar, and sleeve length. If the reference clothing is made of fluffy/fleece/plush material, the generated clothing MUST showcase that exact same fluffy/plush texture. DO NOT add sleeves if the reference clothing is sleeveless (e.g., a vest or tank top). The clothing must be an EXACT 1:1 match in appearance and material feel, fitted perfectly to the pet.";
+      
+      const saasContextStr = saasInfo?.context ? ` ${saasInfo.context}` : "";
+      const saasKeywordsStr = (saasInfo?.prompt && saasInfo.prompt.length > 0) ? ` ${saasInfo.prompt.join(',')}` : "";
+      const additionalConstraints = saasContextStr + saasKeywordsStr;
+
       const prompts = [
-         `${exactIdentity} ${exactClothing} TASK: Create a highly detailed photograph. POSING AND ANGLE: The pet is in an adorable sitting pose with its front paws resting softly in front of it. Its body is turned at a slight 3/4 angle, but its head is turned perfectly to face the front, looking slightly upward directly into the camera with large, cute, expressive eyes. ${unifiedEnvironment}`,
-         `${exactIdentity} ${exactClothing} TASK: Create a highly detailed photograph. POSING AND ANGLE: The pet is sitting mostly facing away from the camera, clearly showcasing the entire back design and patterns of the clothing item. The pet's head is turned back gracefully over its shoulder, looking adorably back up at the camera. ${unifiedEnvironment}`
+         `${exactIdentity} ${exactClothing} TASK: Create a highly detailed photograph.${additionalConstraints} POSING AND ANGLE: The pet is in an adorable sitting pose with its front paws resting softly in front of it. Its body is turned at a slight 3/4 angle, but its head is turned perfectly to face the front, looking slightly upward directly into the camera with large, cute, expressive eyes. ${unifiedEnvironment}`,
+         `${exactIdentity} ${exactClothing} TASK: Create a highly detailed photograph.${additionalConstraints} POSING AND ANGLE: The pet is sitting mostly facing away from the camera, clearly showcasing the entire back design and patterns of the clothing item. The pet's head is turned back gracefully over its shoulder, looking adorably back up at the camera. ${unifiedEnvironment}`
       ];
 
       // Initialize results with nulls so the loading indicators appear for all cards
@@ -206,9 +215,9 @@ export default function App() {
                    fetch('/api/tool/consume', {
                      method: "POST",
                      headers: { "Content-Type": "application/json" },
-                     body: JSON.stringify(saasInfo)
+                     body: JSON.stringify({ userId: saasInfo.userId, toolId: saasInfo.toolId })
                    }).then(res => res.json()).then(d => {
-                     if (d.success && d.data?.currentIntegral !== undefined) {
+                     if (d.success !== false && d.data?.currentIntegral !== undefined) {
                        setIntegral(d.data.currentIntegral);
                      }
                    }).catch(e => console.warn("Consume error", e));

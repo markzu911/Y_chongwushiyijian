@@ -32,9 +32,15 @@ async function startServer() {
         headers: { 'Content-Type': 'application/json' }
       });
       res.status(response.status).json(response.data);
-    } catch (error) {
-      console.error(`代理转发失败 [${targetPath}]:`, error);
-      res.status(500).json({ error: "代理转发失败" });
+    } catch (error: any) {
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        res.status(error.response.status).json(error.response.data);
+      } else {
+        console.error(`代理转发失败 [${targetPath}]:`, error);
+        res.status(500).json({ error: "代理转发失败" });
+      }
     }
   };
 
