@@ -152,11 +152,11 @@ export default function App() {
       }
 
       const unifiedEnvironment = "ENVIRONMENT: The pet is sitting in a warm, cozy, and inviting indoor home setting, resting on a soft plush beige blanket or cushion. The beautifully blurred background features subtle warm wooden textures and soft glowing ambient light. Highly detailed, soft realistic warm indoor lighting.";
-      const exactIdentity = "CRITICAL INSTRUCTION: You MUST perfectly duplicate the pet's identity from the 'Reference Pet Image'. The fur color, fur pattern, eye color, face shape, coat texture, and breed features must remain EXACTLY the same. DO NOT change or hallucinate any of the pet's original physical traits. The final image MUST look precisely like the reference pet.";
+      const exactIdentity = "ABSOLUTE CRITICAL INSTRUCTION: THIS IS A VIRTUAL TRY-ON TASK. The pet in the final image MUST BE A PERFECT 100% COPY of the 'Reference Pet Image'. The pet's face, fur pattern, specific fur colors, spots, eye shape, eye color, nose shape, and bodily proportions must be 100% IDENTICAL. Treat the Reference Pet Image as a strict subject character. DO NOT alter even a single hair or whisker of the original pet. It must look exactly like the uploaded pet.";
       const exactClothing = "CRITICAL CLOTHING INSTRUCTION: You MUST perfectly duplicate the clothing item from the 'Reference Clothing Image'. Pay strict attention to the FABRIC TEXTURE, material, fluffiness, woven details, cut, structure, collar, and sleeve length. If the reference clothing is made of fluffy/fleece/plush material, the generated clothing MUST showcase that exact same fluffy/plush texture. DO NOT add sleeves if the reference clothing is sleeveless (e.g., a vest or tank top). The clothing must be an EXACT 1:1 match in appearance and material feel, fitted perfectly to the pet.";
       const prompts = [
-         `Create a highly detailed photograph of the exact same pet from the Reference Pet Image. ${exactIdentity} ${exactClothing} POSING AND ANGLE: The pet is in an adorable sitting pose with its front paws resting softly in front of it. Its body is turned at a slight 3/4 angle, but its head is turned perfectly to face the front, looking slightly upward directly into the camera with large, cute, expressive eyes. ${unifiedEnvironment}`,
-         `Create a highly detailed photograph of the exact same pet from the Reference Pet Image. ${exactIdentity} ${exactClothing} POSING AND ANGLE: The pet is sitting mostly facing away from the camera, clearly showcasing the entire back design and patterns of the clothing item. The pet's head is turned back gracefully over its shoulder, looking adorably back up at the camera. ${unifiedEnvironment}`
+         `${exactIdentity} ${exactClothing} TASK: Create a highly detailed photograph. POSING AND ANGLE: The pet is in an adorable sitting pose with its front paws resting softly in front of it. Its body is turned at a slight 3/4 angle, but its head is turned perfectly to face the front, looking slightly upward directly into the camera with large, cute, expressive eyes. ${unifiedEnvironment}`,
+         `${exactIdentity} ${exactClothing} TASK: Create a highly detailed photograph. POSING AND ANGLE: The pet is sitting mostly facing away from the camera, clearly showcasing the entire back design and patterns of the clothing item. The pet's head is turned back gracefully over its shoulder, looking adorably back up at the camera. ${unifiedEnvironment}`
       ];
 
       // Initialize results with nulls so the loading indicators appear for all cards
@@ -171,11 +171,11 @@ export default function App() {
             model: "gemini-3.1-flash-image-preview",
             contents: {
                 parts: [
-                { text: prompts[i] },
-                { text: "Reference Pet Image:" },
+                { text: "Subject to preserve EXACTLY (Reference Pet Image):" },
                 { inlineData: { data: petB64, mimeType: petMime } },
-                { text: "Reference Clothing Image:" },
-                { inlineData: { data: clothB64, mimeType: clothMime } }
+                { text: "Clothing to wear EXACTLY (Reference Clothing Image):" },
+                { inlineData: { data: clothB64, mimeType: clothMime } },
+                { text: prompts[i] }
                 ]
             },
             config: {
