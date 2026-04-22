@@ -1,0 +1,6 @@
+{
+  "name": "宠物试衣间",
+  "description": "上传宠物照片和服装照片，AI智能分析特征并一键生成宠物试衣的多角度效果图。",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
