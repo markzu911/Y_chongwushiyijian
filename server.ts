@@ -8,7 +8,7 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  const genAI = new GoogleGenAI(process.env.GEMINI_API_KEY || "");
+  const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
   app.use(express.json({ limit: '10mb' }));
 
@@ -28,16 +28,11 @@ async function startServer() {
   app.post("/api/gemini", async (req, res) => {
     const { model, contents, config } = req.body;
     try {
-      const geminiModel = genAI.getGenerativeModel({ model });
-      const result = await geminiModel.generateContent({
+      const response = await genAI.models.generateContent({
+        model: model,
         contents: contents.contents || contents, // Handle both standard and nested structures
         ...config
       });
-      const response = await result.response;
-      // We need to return a structure that looks like what the client expects from the SDK
-      // The SDK returns a GenerateContentResult which has candidates, etc.
-      // But usually people just use .text or .response.
-      // However, the client code uses resp?.candidates?.[0]?.content?.parts
       res.json(response);
     } catch (error: any) {
       console.error("Gemini API error:", error);

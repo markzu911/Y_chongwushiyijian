@@ -1,8 +1,11 @@
 import express from "express";
 import axios from "axios";
+import { GoogleGenAI } from "@google/genai";
 
 const app = express();
 app.use(express.json({ limit: '10mb' }));
+
+const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -15,6 +18,21 @@ app.use((req, res, next) => {
     return;
   }
   next();
+});
+
+app.post("/api/gemini", async (req, res) => {
+  const { model, contents, config } = req.body;
+  try {
+    const response = await genAI.models.generateContent({
+      model: model,
+      contents: contents.contents || contents,
+      ...config
+    });
+    res.json(response);
+  } catch (error: any) {
+    console.error("Gemini API error:", error);
+    res.status(500).json({ error: error.message || "Gemini API error" });
+  }
 });
 
 const proxyRequest = async (req: express.Request, res: express.Response, targetPath: string) => {
