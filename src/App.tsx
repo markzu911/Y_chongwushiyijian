@@ -1,8 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Sparkles, AlertCircle, RefreshCw, Camera, Image as ImageIcon, Download } from 'lucide-react';
-import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+async function generateGeminiContent(options: { model: string, contents: any, config?: any }) {
+  const res = await fetch("/api/gemini", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(options),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Generation failed");
+  }
+  return res.json();
+}
 
 function parseBase64(dataUrl: string): [string, string] {
   const matches = dataUrl.match(/^data:(.+);base64,(.+)$/);
@@ -136,7 +146,7 @@ export default function App() {
       // Verify if pet is a cat or dog first
       const checkPrompt = `Is the subject in this image a real cat or a real dog? Respond with a JSON object containing a single boolean field "isCatOrDog" set to true if it is a real cat or dog, and false otherwise.`;
       
-      const checkResponse = await ai.models.generateContent({
+      const checkResponse = await generateGeminiContent({
         model: "gemini-2.5-flash",
         contents: {
           parts: [
@@ -149,7 +159,7 @@ export default function App() {
         }
       });
       
-      const checkResultText = checkResponse.text || "{}";
+      const checkResultText = checkResponse.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
       const checkResultObj = JSON.parse(checkResultText);
       if (checkResultObj.isCatOrDog === false) {
         throw new Error("只能上传猫或狗的图片");
@@ -176,7 +186,7 @@ export default function App() {
 
       for (let i = 0; i < prompts.length; i++) {
         try {
-            const resp = await ai.models.generateContent({
+            const resp = await generateGeminiContent({
             model: "gemini-3.1-flash-image-preview",
             contents: {
                 parts: [
