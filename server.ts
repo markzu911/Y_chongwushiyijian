@@ -2,13 +2,13 @@ import express from "express";
 import { createServer as createViteServer } from "vite";
 import axios from "axios";
 import path from "path";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
   app.use(express.json({ limit: '10mb' }));
 
@@ -25,14 +25,28 @@ async function startServer() {
     next();
   });
 
-  app.post("/api/gemini", async (req, res) => {
+  // Robust API route handling
+  const apiRouter = express.Router();
+
+  apiRouter.use((req, res, next) => {
+    console.log(`[API Router] ${req.method} ${req.path}`);
+    next();
+  });
+
+  apiRouter.post("/gemini", async (req, res) => {
+    console.log("Handling /api/gemini via router");
     const { model, contents, config } = req.body;
     try {
-      const response = await genAI.models.generateContent({
-        model: model,
-        contents: contents.contents || contents, // Handle both standard and nested structures
+      if (!process.env.GEMINI_API_KEY) {
+        throw new Error("GEMINI_API_KEY is not set in environment");
+      }
+      const geminiModel = genAI.getGenerativeModel({ model });
+      const result = await geminiModel.generateContent({
+        contents: contents.contents || contents,
         ...config
       });
+      const response = await result.response;
+      // Ensure we send back a clean JSON
       res.json(response);
     } catch (error: any) {
       console.error("Gemini API error:", error);
@@ -52,8 +66,6 @@ async function startServer() {
       res.status(response.status).json(response.data);
     } catch (error: any) {
       if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
         res.status(error.response.status).json(error.response.data);
       } else {
         console.error(`代理转发失败 [${targetPath}]:`, error);
@@ -62,9 +74,11 @@ async function startServer() {
     }
   };
 
-  app.post("/api/tool/launch", (req, res) => proxyRequest(req, res, "/api/tool/launch"));
-  app.post("/api/tool/verify", (req, res) => proxyRequest(req, res, "/api/tool/verify"));
-  app.post("/api/tool/consume", (req, res) => proxyRequest(req, res, "/api/tool/consume"));
+  apiRouter.post("/tool/launch", (req, res) => proxyRequest(req, res, "/api/tool/launch"));
+  apiRouter.post("/tool/verify", (req, res) => proxyRequest(req, res, "/api/tool/verify"));
+  apiRouter.post("/tool/consume", (req, res) => proxyRequest(req, res, "/api/tool/consume"));
+
+  app.use("/api", apiRouter);
 
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
