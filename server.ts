@@ -43,7 +43,7 @@ async function startServer() {
       const geminiModel = genAI.getGenerativeModel({ model });
       const result = await geminiModel.generateContent({
         contents: contents.contents || contents,
-        ...config
+        generationConfig: config
       });
       const response = await result.response;
       // Ensure we send back a clean JSON
