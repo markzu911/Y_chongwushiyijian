@@ -254,18 +254,18 @@ export default function App() {
           积分余额: {integral}
         </div>
       )}
-      <aside className="w-[320px] bg-sidebar border-r border-border p-6 flex flex-col gap-6 overflow-y-auto shrink-0 shadow-sm relative z-10 hidden md:flex">
-        <div className="text-[24px] font-[700] text-accent tracking-[-0.5px] items-center gap-2 flex">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <aside className="w-[320px] bg-sidebar border-r border-border p-6 flex flex-col gap-6 overflow-y-auto shrink-0 relative z-10 hidden md:flex">
+        <div className="text-[22px] font-[700] text-accent tracking-[-1px] items-center gap-2 flex uppercase">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M10 5.172a2 2 0 0 0-1.414.586l-1.172 1.172A2 2 0 0 1 6 7.5H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-10a2 2 0 0 0-2-2h-2a2 2 0 0 1-1.414-.586l-1.172-1.172A2 2 0 0 0 14 5.172h-4Z"/>
             <circle cx="12" cy="13" r="3"/>
           </svg>
-          宠物试衣间
+          试衣间
         </div>
 
         <div className="flex flex-col gap-3">
           {error && (
-            <div className="mt-2 p-3 bg-red-50 text-red-600 rounded-[8px] flex gap-2 text-[12px] border border-red-100">
+            <div className="mt-2 p-3 bg-black text-white rounded-[4px] flex gap-2 text-[12px] border border-black">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
               <p>{error}</p>
             </div>
@@ -273,11 +273,11 @@ export default function App() {
         </div>
 
         <div className="flex flex-col gap-3">
-          <div className="text-[12px] uppercase tracking-[1px] text-text-muted font-[600]">输出设置 (分辨率)</div>
+          <div className="text-[11px] uppercase tracking-[2px] text-text-muted font-[700]">输出设置</div>
           <div className="grid grid-cols-3 gap-2">
             {(["1K", "2K", "4K"] as ImageSize[]).map(res => (
               <button key={res} onClick={() => setResolution(res)}
-                className={`border p-[8px] rounded-[8px] text-[13px] text-center cursor-pointer transition-colors ${resolution === res ? 'border-accent bg-active-bg text-accent font-[600]' : 'border-border bg-white text-text-main hover:border-accent/50'}`}>
+                className={`border p-[8px] rounded-[4px] text-[12px] text-center cursor-pointer transition-all ${resolution === res ? 'border-black bg-black text-white font-[600]' : 'border-border bg-white text-text-main hover:border-black'}`}>
                 {res}
               </button>
             ))}
@@ -285,11 +285,11 @@ export default function App() {
         </div>
 
         <div className="flex flex-col gap-3">
-          <div className="text-[12px] uppercase tracking-[1px] text-text-muted font-[600]">画面比例</div>
+          <div className="text-[11px] uppercase tracking-[2px] text-text-muted font-[700]">画面比例</div>
           <div className="grid grid-cols-3 gap-2">
             {(["1:1", "3:4", "4:3"] as AspectRatio[]).map(ar => (
               <button key={ar} onClick={() => setAspectRatio(ar)}
-                className={`border p-[8px] rounded-[8px] text-[13px] text-center cursor-pointer transition-colors ${aspectRatio === ar ? 'border-accent bg-active-bg text-accent font-[600]' : 'border-border bg-white text-text-main hover:border-accent/50'}`}>
+                className={`border p-[8px] rounded-[4px] text-[12px] text-center cursor-pointer transition-all ${aspectRatio === ar ? 'border-black bg-black text-white font-[600]' : 'border-border bg-white text-text-main hover:border-black'}`}>
                 {ar}
               </button>
             ))}
@@ -299,26 +299,26 @@ export default function App() {
         <button 
           onClick={handleGenerate} 
           disabled={!petImage || !clothImage || isGenerating}
-          className="mt-auto bg-accent text-white border-none p-[16px] rounded-[12px] text-[16px] font-[600] cursor-pointer transition-colors hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="mt-auto bg-black text-white border border-black p-[16px] rounded-[4px] text-[14px] font-[700] uppercase tracking-[1px] cursor-pointer transition-all hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
-          {isGenerating && <RefreshCw className="animate-spin w-5 h-5" />}
-          {isGenerating ? '生成中...' : '一键生成宠物写真'}
+          {isGenerating && <RefreshCw className="animate-spin w-4 h-4" />}
+          {isGenerating ? '处理中' : '开始生成 写真'}
         </button>
       </aside>
 
-      <main className="flex-1 p-8 flex flex-col gap-6 overflow-y-auto w-full md:w-auto h-full pb-32 md:pb-8">
-        <div className="md:hidden text-[24px] font-[700] text-accent tracking-[-0.5px] items-center gap-2 mb-2 flex">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <main className="flex-1 p-8 flex flex-col gap-8 overflow-y-auto w-full md:w-auto h-full pb-32 md:pb-8">
+        <div className="md:hidden text-[22px] font-[700] text-accent tracking-[-1px] items-center gap-2 mb-4 flex uppercase">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M10 5.172a2 2 0 0 0-1.414.586l-1.172 1.172A2 2 0 0 1 6 7.5H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-10a2 2 0 0 0-2-2h-2a2 2 0 0 1-1.414-.586l-1.172-1.172A2 2 0 0 0 14 5.172h-4Z"/>
             <circle cx="12" cy="13" r="3"/>
           </svg>
-          宠物试衣间
+          试衣间
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-[20px] lg:h-[220px] shrink-0">
+        <div className="flex flex-col sm:flex-row gap-[24px] lg:h-[240px] shrink-0">
           <UploadBox 
             title="宠物照片" 
-            desc="支持 JPG, PNG (最大 10MB)"
+            desc="最大支持 10MB"
             icon="🐕"
             image={petImage} 
             onUpload={(f) => handleImageUpload(f, 'pet')} 
@@ -326,7 +326,7 @@ export default function App() {
           />
           <UploadBox 
             title="服装照片" 
-            desc="支持 JPG, PNG (最大 10MB)"
+            desc="最大支持 10MB"
             icon="👕"
             image={clothImage} 
             onUpload={(f) => handleImageUpload(f, 'cloth')} 
@@ -334,22 +334,22 @@ export default function App() {
           />
         </div>
 
-        <div className="mt-2 flex-1 flex flex-col gap-[12px]">
-          <div className="text-[12px] uppercase tracking-[1px] text-text-muted font-[600]">预览生成结果</div>
+        <div className="mt-4 flex-1 flex flex-col gap-[16px]">
+          <div className="text-[11px] uppercase tracking-[2px] text-text-muted font-[700]">结果预览</div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-[20px] flex-1 min-h-[300px]">
-            <ResultCard title="宠物试穿正面图" badge="FRONT" desc="正面视觉效果" active={isGenerating && !results[0]} src={results[0]} icon={isGenerating && !results[0] ? <RefreshCw className="w-8 h-8 animate-spin text-accent"/> : <ImageIcon className="w-12 h-12 opacity-20" />} />
-            <ResultCard title="宠物试穿背面图" badge="BACK" desc="背面及回眸效果" active={isGenerating && !results[1]} src={results[1]} icon={isGenerating && !results[1] ? <RefreshCw className="w-8 h-8 animate-spin text-accent"/> : <ImageIcon className="w-12 h-12 opacity-20" />} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-[24px] flex-1 min-h-[350px]">
+            <ResultCard title="正面视角" badge="正面" desc="正面效果" active={isGenerating && !results[0]} src={results[0]} icon={isGenerating && !results[0] ? <RefreshCw className="w-6 h-6 animate-spin text-black"/> : <ImageIcon className="w-10 h-10 opacity-10" />} />
+            <ResultCard title="背面视角" badge="背面" desc="背面效果" active={isGenerating && !results[1]} src={results[1]} icon={isGenerating && !results[1] ? <RefreshCw className="w-6 h-6 animate-spin text-black"/> : <ImageIcon className="w-10 h-10 opacity-10" />} />
           </div>
         </div>
 
-        <div className="md:hidden flex flex-col gap-6 mt-4">
+        <div className="md:hidden flex flex-col gap-6 mt-6">
            <div className="flex flex-col gap-3">
-             <div className="text-[12px] uppercase tracking-[1px] text-text-muted font-[600]">输出设置 (分辨率)</div>
+             <div className="text-[11px] uppercase tracking-[2px] text-text-muted font-[700]">分辨率</div>
              <div className="grid grid-cols-3 gap-2">
               {(["1K", "2K", "4K"] as ImageSize[]).map(res => (
                 <button key={`m-${res}`} onClick={() => setResolution(res)}
-                  className={`border bg-white p-[8px] rounded-[8px] text-[13px] text-center cursor-pointer transition-colors ${resolution === res ? 'border-accent bg-active-bg text-accent font-[600]' : 'border-border text-text-main hover:border-accent/50'}`}>
+                  className={`border bg-white p-[8px] rounded-[4px] text-[12px] text-center cursor-pointer transition-all ${resolution === res ? 'border-black bg-black text-white font-[600]' : 'border-border text-text-main hover:border-black'}`}>
                   {res}
                 </button>
               ))}
@@ -357,11 +357,11 @@ export default function App() {
           </div>
 
           <div className="flex flex-col gap-3">
-             <div className="text-[12px] uppercase tracking-[1px] text-text-muted font-[600]">画面比例</div>
+             <div className="text-[11px] uppercase tracking-[2px] text-text-muted font-[700]">比例</div>
              <div className="grid grid-cols-3 gap-2">
               {(["1:1", "3:4", "4:3"] as AspectRatio[]).map(ar => (
                 <button key={`mar-${ar}`} onClick={() => setAspectRatio(ar)}
-                  className={`border bg-white p-[8px] rounded-[8px] text-[13px] text-center cursor-pointer transition-colors ${aspectRatio === ar ? 'border-accent bg-active-bg text-accent font-[600]' : 'border-border text-text-main hover:border-accent/50'}`}>
+                  className={`border bg-white p-[10px] rounded-[4px] text-[12px] text-center cursor-pointer transition-all ${aspectRatio === ar ? 'border-black bg-black text-white font-[600]' : 'border-border text-text-main hover:border-black'}`}>
                   {ar}
                 </button>
               ))}
@@ -371,10 +371,10 @@ export default function App() {
           <button 
             onClick={handleGenerate} 
             disabled={!petImage || !clothImage || isGenerating}
-            className="w-full bg-accent text-white border-none p-[16px] rounded-[12px] text-[16px] font-[600] cursor-pointer transition-colors hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 shadow-sm"
+            className="w-full bg-black text-white border border-black p-[16px] rounded-[4px] text-[14px] font-[700] uppercase tracking-[1px] cursor-pointer transition-all hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 shadow-xl"
           >
-            {isGenerating && <RefreshCw className="animate-spin w-5 h-5" />}
-            {isGenerating ? '生成中...' : '一键生成宠物写真'}
+            {isGenerating && <RefreshCw className="animate-spin w-4 h-4" />}
+            {isGenerating ? '生成中' : '一键生成 写真'}
           </button>
         </div>
 
@@ -398,16 +398,16 @@ function UploadBox({ title, desc, icon, image, onUpload, onRemove }: { title: st
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleDrop}
       onClick={() => !image && fileInputRef.current?.click()}
-      className={`flex-1 border-2 border-dashed rounded-[16px] flex flex-col items-center justify-center bg-card text-text-muted text-center relative overflow-hidden transition-all h-[220px] sm:h-auto
-        ${image ? 'border-transparent' : 'border-border hover:border-accent/50 cursor-pointer'}`}
+      className={`flex-1 border border-dashed rounded-[4px] flex flex-col items-center justify-center bg-card text-text-muted text-center relative overflow-hidden transition-all h-[240px] sm:h-auto
+        ${image ? 'border-transparent' : 'border-border hover:border-black cursor-pointer'}`}
     >
       {image ? (
         <>
-          <img src={image} alt={title} className="w-full h-full object-contain p-2" />
-          <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+          <img src={image} alt={title} className="w-full h-full object-contain p-4" />
+          <div className="absolute inset-0 bg-white/60 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center blur-backdrop">
             <button 
               onClick={(e) => { e.stopPropagation(); onRemove(); }}
-              className="px-4 py-2 bg-white/90 text-text-main text-sm font-[500] rounded-[8px] hover:bg-white transition-colors shadow-sm"
+              className="px-6 py-2 bg-black text-white text-[12px] font-[700] uppercase tracking-[1px] rounded-[4px] hover:bg-neutral-800 transition-all border border-black"
             >
               移除照片
             </button>
@@ -415,9 +415,9 @@ function UploadBox({ title, desc, icon, image, onUpload, onRemove }: { title: st
         </>
       ) : (
         <div className="flex flex-col items-center p-4">
-          <div className="text-[40px] mb-[12px] opacity-50 select-none">{icon}</div>
-          <div className="text-[16px] text-text-main font-medium">{title}</div>
-          <div className="text-[11px] mt-[4px]">{desc}</div>
+          <div className="text-[32px] mb-[12px] grayscale select-none">{icon}</div>
+          <div className="text-[12px] text-text-main font-bold uppercase tracking-[1px]">{title}</div>
+          <div className="text-[10px] mt-[4px] opacity-60 tracking-[1px] font-medium">{desc}</div>
         </div>
       )}
       <input 
@@ -443,18 +443,18 @@ function ResultCard({ title, badge, desc, active, src, icon }: { title: string, 
   };
 
   return (
-    <div className="bg-card rounded-[16px] border border-border flex flex-col overflow-hidden h-[300px] lg:h-auto lg:min-h-[300px] group relative">
+    <div className="bg-card rounded-[4px] border border-border flex flex-col overflow-hidden h-[350px] lg:h-auto lg:min-h-[350px] group relative transition-all hover:border-black">
       <div className="flex-1 bg-tag flex items-center justify-center relative">
-        <span className="absolute top-[12px] left-[12px] bg-white/90 px-[8px] py-[4px] rounded-[4px] text-[11px] font-[600] text-accent z-10 shadow-sm">
+        <span className="absolute top-[12px] left-[12px] bg-black text-white px-[8px] py-[4px] rounded-[2px] text-[10px] font-[700] tracking-[1px] z-10 uppercase">
           {badge}
         </span>
         {src && (
           <button 
             onClick={handleDownload}
-            className="absolute top-[12px] right-[12px] z-10 bg-white/90 text-accent p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 hover:bg-white shadow-sm"
-            title="Download Image"
+            className="absolute top-[12px] right-[12px] z-10 bg-black text-white p-2 rounded-[4px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 hover:bg-neutral-800"
+            title="下载图片"
           >
-            <Download className="w-4 h-4" />
+            <Download className="w-3.5 h-3.5" />
           </button>
         )}
         {src ? (
@@ -462,11 +462,11 @@ function ResultCard({ title, badge, desc, active, src, icon }: { title: string, 
         ) : (
           <div className="flex flex-col items-center gap-3">
              {icon}
-             {!active && <div className="text-text-muted opacity-40 text-[14px] font-[500]">{desc}</div>}
+             {!active && <div className="text-text-muted opacity-20 text-[12px] font-[600] uppercase tracking-[1px]">{desc}</div>}
           </div>
         )}
       </div>
-      <div className="p-[12px] text-[14px] text-center font-[500] border-t border-border bg-card text-text-main shrink-0">
+      <div className="p-[12px] text-[12px] text-center font-[700] border-t border-border bg-card text-text-main shrink-0 uppercase tracking-[1px]">
         {title}
       </div>
     </div>
