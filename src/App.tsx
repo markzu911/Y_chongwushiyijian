@@ -259,7 +259,7 @@ export default function App() {
   return (
     <div className="flex h-[100dvh] w-full bg-bg-base text-text-main font-sans overflow-hidden mx-auto max-w-[1400px] relative">
       {integral !== null && (
-        <div className="absolute top-6 right-6 bg-accent text-white px-4 py-2 rounded-full text-[14px] font-[600] shadow-sm flex items-center gap-2 z-50">
+        <div className="absolute top-6 right-6 bg-accent text-white px-4 py-2 flex items-center gap-2 rounded-full text-[13px] font-[600] shadow-sm z-50 transition-all">
           <Sparkles className="w-4 h-4" />
           积分余额: {integral}
         </div>
@@ -275,7 +275,7 @@ export default function App() {
 
         <div className="flex flex-col gap-3">
           {error && (
-            <div className="mt-2 p-3 bg-black text-white rounded-[4px] flex gap-2 text-[12px] border border-black">
+            <div className="mt-2 p-3 bg-red-50 text-red-600 rounded-xl flex gap-2 text-[12px] border border-red-100">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
               <p>{error}</p>
             </div>
@@ -287,7 +287,7 @@ export default function App() {
           <div className="grid grid-cols-3 gap-2">
             {(["1K", "2K", "4K"] as ImageSize[]).map(res => (
               <button key={res} onClick={() => setResolution(res)}
-                className={`border p-[8px] rounded-[4px] text-[12px] text-center cursor-pointer transition-all ${resolution === res ? 'border-black bg-black text-white font-[600]' : 'border-border bg-white text-text-main hover:border-black'}`}>
+                className={`border p-[8px] rounded-xl text-[12px] text-center cursor-pointer transition-all ${resolution === res ? 'border-accent bg-accent text-white font-[600]' : 'border-border bg-white text-text-main hover:border-accent'}`}>
                 {res}
               </button>
             ))}
@@ -299,7 +299,7 @@ export default function App() {
           <div className="grid grid-cols-3 gap-2">
             {(["1:1", "3:4", "4:3"] as AspectRatio[]).map(ar => (
               <button key={ar} onClick={() => setAspectRatio(ar)}
-                className={`border p-[8px] rounded-[4px] text-[12px] text-center cursor-pointer transition-all ${aspectRatio === ar ? 'border-black bg-black text-white font-[600]' : 'border-border bg-white text-text-main hover:border-black'}`}>
+                className={`border p-[8px] rounded-xl text-[12px] text-center cursor-pointer transition-all ${aspectRatio === ar ? 'border-accent bg-accent text-white font-[600]' : 'border-border bg-white text-text-main hover:border-accent'}`}>
                 {ar}
               </button>
             ))}
@@ -309,7 +309,7 @@ export default function App() {
         <button 
           onClick={handleGenerate} 
           disabled={!petImage || !clothImage || isGenerating}
-          className="mt-auto bg-black text-white border border-black p-[16px] rounded-[4px] text-[14px] font-[700] uppercase tracking-[1px] cursor-pointer transition-all hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="mt-auto bg-accent text-white border border-accent p-[16px] rounded-xl text-[14px] font-[700] uppercase tracking-[1px] cursor-pointer transition-all hover:bg-accent-hover disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {isGenerating && <RefreshCw className="animate-spin w-4 h-4" />}
           {isGenerating ? '处理中' : '开始生成 写真'}
@@ -359,7 +359,7 @@ export default function App() {
              <div className="grid grid-cols-3 gap-2">
               {(["1K", "2K", "4K"] as ImageSize[]).map(res => (
                 <button key={`m-${res}`} onClick={() => setResolution(res)}
-                  className={`border bg-white p-[8px] rounded-[4px] text-[12px] text-center cursor-pointer transition-all ${resolution === res ? 'border-black bg-black text-white font-[600]' : 'border-border text-text-main hover:border-black'}`}>
+                  className={`border bg-white p-[8px] rounded-xl text-[12px] text-center cursor-pointer transition-all ${resolution === res ? 'border-accent bg-accent text-white font-[600]' : 'border-border text-text-main hover:border-accent'}`}>
                   {res}
                 </button>
               ))}
@@ -371,7 +371,7 @@ export default function App() {
              <div className="grid grid-cols-3 gap-2">
               {(["1:1", "3:4", "4:3"] as AspectRatio[]).map(ar => (
                 <button key={`mar-${ar}`} onClick={() => setAspectRatio(ar)}
-                  className={`border bg-white p-[10px] rounded-[4px] text-[12px] text-center cursor-pointer transition-all ${aspectRatio === ar ? 'border-black bg-black text-white font-[600]' : 'border-border text-text-main hover:border-black'}`}>
+                  className={`border bg-white p-[10px] rounded-xl text-[12px] text-center cursor-pointer transition-all ${aspectRatio === ar ? 'border-accent bg-accent text-white font-[600]' : 'border-border text-text-main hover:border-accent'}`}>
                   {ar}
                 </button>
               ))}
@@ -381,7 +381,7 @@ export default function App() {
           <button 
             onClick={handleGenerate} 
             disabled={!petImage || !clothImage || isGenerating}
-            className="w-full bg-black text-white border border-black p-[16px] rounded-[4px] text-[14px] font-[700] uppercase tracking-[1px] cursor-pointer transition-all hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 shadow-xl"
+            className="w-full bg-accent text-white border border-accent p-[16px] rounded-xl text-[14px] font-[700] uppercase tracking-[1px] cursor-pointer transition-all hover:bg-accent-hover disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 shadow-xl"
           >
             {isGenerating && <RefreshCw className="animate-spin w-4 h-4" />}
             {isGenerating ? '生成中' : '一键生成 写真'}
@@ -408,8 +408,8 @@ function UploadBox({ title, desc, icon, image, onUpload, onRemove }: { title: st
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleDrop}
       onClick={() => !image && fileInputRef.current?.click()}
-      className={`flex-1 border border-dashed rounded-[4px] flex flex-col items-center justify-center bg-card text-text-muted text-center relative overflow-hidden transition-all h-[240px] sm:h-auto
-        ${image ? 'border-transparent' : 'border-border hover:border-black cursor-pointer'}`}
+      className={`flex-1 border border-dashed rounded-2xl flex flex-col items-center justify-center bg-card text-text-muted text-center relative overflow-hidden transition-all h-[240px] sm:h-auto
+        ${image ? 'border-transparent' : 'border-border hover:border-accent cursor-pointer'}`}
     >
       {image ? (
         <>
@@ -417,7 +417,7 @@ function UploadBox({ title, desc, icon, image, onUpload, onRemove }: { title: st
           <div className="absolute inset-0 bg-white/60 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center blur-backdrop">
             <button 
               onClick={(e) => { e.stopPropagation(); onRemove(); }}
-              className="px-6 py-2 bg-black text-white text-[12px] font-[700] uppercase tracking-[1px] rounded-[4px] hover:bg-neutral-800 transition-all border border-black"
+              className="px-6 py-2 bg-accent text-white text-[12px] font-[700] uppercase tracking-[1px] rounded-xl hover:bg-accent-hover transition-all border border-accent"
             >
               移除照片
             </button>
@@ -453,18 +453,18 @@ function ResultCard({ title, badge, desc, active, src, icon }: { title: string, 
   };
 
   return (
-    <div className="bg-card rounded-[4px] border border-border flex flex-col overflow-hidden h-[350px] lg:h-auto lg:min-h-[350px] group relative transition-all hover:border-black">
+    <div className="bg-card rounded-2xl border border-border flex flex-col overflow-hidden h-[350px] lg:h-auto lg:min-h-[350px] group relative transition-all hover:border-accent shadow-sm">
       <div className="flex-1 bg-tag flex items-center justify-center relative">
-        <span className="absolute top-[12px] left-[12px] bg-black text-white px-[8px] py-[4px] rounded-[2px] text-[10px] font-[700] tracking-[1px] z-10 uppercase">
+        <span className="absolute top-[12px] left-[12px] bg-accent text-white px-[12px] py-[4px] rounded-full text-[10px] font-[700] tracking-[1px] z-10 uppercase shadow-sm">
           {badge}
         </span>
         {src && (
           <button 
             onClick={handleDownload}
-            className="absolute top-[12px] right-[12px] z-10 bg-black text-white p-2 rounded-[4px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 hover:bg-neutral-800"
+            className="absolute top-[12px] right-[12px] z-10 bg-accent text-white p-2.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1 hover:bg-accent-hover shadow-sm"
             title="下载图片"
           >
-            <Download className="w-3.5 h-3.5" />
+            <Download className="w-4 h-4" />
           </button>
         )}
         {src ? (
@@ -472,11 +472,11 @@ function ResultCard({ title, badge, desc, active, src, icon }: { title: string, 
         ) : (
           <div className="flex flex-col items-center gap-3">
              {icon}
-             {!active && <div className="text-text-muted opacity-20 text-[12px] font-[600] uppercase tracking-[1px]">{desc}</div>}
+             {!active && <div className="text-text-muted opacity-40 text-[12px] font-[600] uppercase tracking-[1px]">{desc}</div>}
           </div>
         )}
       </div>
-      <div className="p-[12px] text-[12px] text-center font-[700] border-t border-border bg-card text-text-main shrink-0 uppercase tracking-[1px]">
+      <div className="p-[16px] text-[13px] text-center font-[700] border-t border-border bg-card text-text-main shrink-0 uppercase tracking-[1px]">
         {title}
       </div>
     </div>
