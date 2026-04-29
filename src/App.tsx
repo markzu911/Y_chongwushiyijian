@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Sparkles, AlertCircle, RefreshCw, Camera, Image as ImageIcon, Download } from 'lucide-react';
+import heic2any from "heic2any";
 
 async function generateGeminiContent(options: { model: string, contents: any, config?: any }) {
   const res = await fetch("/api/gemini", {
@@ -83,8 +84,28 @@ export default function App() {
     };
   }, []);
 
-  const handleImageUpload = (file: File, type: 'pet' | 'cloth') => {
-    if (!file.type.startsWith('image/')) return;
+  const handleImageUpload = async (file: File, type: 'pet' | 'cloth') => {
+    let imageFile = file;
+
+    // Handle HEIC/HEIF conversion
+    const isHeic = file.type === 'image/heic' || file.type === 'image/heif' || 
+                   file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif');
+    
+    if (isHeic) {
+      try {
+        const converted = await heic2any({
+          blob: file,
+          toType: "image/jpeg",
+          quality: 0.8
+        });
+        const blob = Array.isArray(converted) ? converted[0] : converted;
+        imageFile = new File([blob], file.name.split('.')[0] + '.jpg', { type: 'image/jpeg' });
+      } catch (err) {
+        console.error("HEIC conversion error:", err);
+      }
+    }
+
+    if (!imageFile.type.startsWith('image/')) return;
     const reader = new FileReader();
     reader.onload = (e) => {
       const b64 = e.target?.result as string;
@@ -94,7 +115,7 @@ export default function App() {
         setClothImage(b64);
       }
     };
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(imageFile);
   };
 
   const handleGenerate = async () => {
@@ -328,7 +349,7 @@ export default function App() {
         <div className="flex flex-col sm:flex-row gap-[24px] lg:h-[240px] shrink-0">
           <UploadBox 
             title="宠物照片" 
-            desc="最大支持 10MB"
+            desc="支持 JPG, PNG, WEBP, HEIC (最大 10MB)"
             icon="🐕"
             image={petImage} 
             onUpload={(f) => handleImageUpload(f, 'pet')} 
@@ -336,7 +357,7 @@ export default function App() {
           />
           <UploadBox 
             title="服装照片" 
-            desc="最大支持 10MB"
+            desc="支持 JPG, PNG, WEBP, HEIC (最大 10MB)"
             icon="👕"
             image={clothImage} 
             onUpload={(f) => handleImageUpload(f, 'cloth')} 
@@ -433,7 +454,7 @@ function UploadBox({ title, desc, icon, image, onUpload, onRemove }: { title: st
       <input 
         type="file" 
         ref={fileInputRef} 
-        accept="image/*" 
+        accept="image/jpeg,image/png,image/webp,image/heic,image/heif,image/bmp" 
         onChange={(e) => e.target.files?.[0] && onUpload(e.target.files[0])} 
         className="hidden" 
       />
