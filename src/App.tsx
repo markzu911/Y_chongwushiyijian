@@ -15,6 +15,38 @@ async function generateGeminiContent(options: { model: string, contents: any, co
   return res.json();
 }
 
+const compressImage = (base64: string, maxWidth = 1600, quality = 0.85): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.src = base64;
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let width = img.width;
+      let height = img.height;
+
+      if (width > height) {
+        if (width > maxWidth) {
+          height *= maxWidth / width;
+          width = maxWidth;
+        }
+      } else {
+        if (height > maxWidth) {
+          width *= maxWidth / height;
+          height = maxWidth;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return reject(new Error('Canvas context failed'));
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = (err) => reject(err);
+  });
+};
+
 function parseBase64(dataUrl: string): [string, string] {
   const matches = dataUrl.match(/^data:(.+);base64,(.+)$/);
   if (!matches || matches.length !== 3) {
@@ -107,12 +139,23 @@ export default function App() {
 
     if (!imageFile.type.startsWith('image/')) return;
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       const b64 = e.target?.result as string;
-      if (type === 'pet') {
-        setPetImage(b64);
-      } else {
-        setClothImage(b64);
+      try {
+        const compressed = await compressImage(b64);
+        if (type === 'pet') {
+          setPetImage(compressed);
+        } else {
+          setClothImage(compressed);
+        }
+      } catch (err) {
+        console.error("Compression error:", err);
+        // Fallback to original if compression fails
+        if (type === 'pet') {
+          setPetImage(b64);
+        } else {
+          setClothImage(b64);
+        }
       }
     };
     reader.readAsDataURL(imageFile);
@@ -349,7 +392,7 @@ export default function App() {
         <div className="flex flex-col sm:flex-row gap-[24px] lg:h-[240px] shrink-0">
           <UploadBox 
             title="宠物照片" 
-            desc="支持 JPG, PNG, WEBP, HEIC (最大 10MB)"
+            desc="支持 JPG, PNG, WebP, HEIC (最大 20MB)"
             icon="🐕"
             image={petImage} 
             onUpload={(f) => handleImageUpload(f, 'pet')} 
@@ -357,7 +400,7 @@ export default function App() {
           />
           <UploadBox 
             title="服装照片" 
-            desc="支持 JPG, PNG, WEBP, HEIC (最大 10MB)"
+            desc="支持 JPG, PNG, WebP, HEIC (最大 20MB)"
             icon="👕"
             image={clothImage} 
             onUpload={(f) => handleImageUpload(f, 'cloth')} 
