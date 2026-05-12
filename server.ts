@@ -60,7 +60,8 @@ async function startServer() {
       const response = await axios({
         method: req.method,
         url: targetUrl,
-        data: req.body,
+        data: req.method !== 'GET' ? req.body : undefined,
+        params: req.method === 'GET' ? req.query : undefined,
         headers: { 'Content-Type': 'application/json' }
       });
       res.status(response.status).json(response.data);
@@ -77,6 +78,13 @@ async function startServer() {
   apiRouter.post("/tool/launch", (req, res) => proxyRequest(req, res, "/api/tool/launch"));
   apiRouter.post("/tool/verify", (req, res) => proxyRequest(req, res, "/api/tool/verify"));
   apiRouter.post("/tool/consume", (req, res) => proxyRequest(req, res, "/api/tool/consume"));
+
+  // Image upload related routes
+  apiRouter.post("/upload/image", (req, res) => proxyRequest(req, res, "/api/upload/image"));
+  apiRouter.get("/upload/image", (req, res) => proxyRequest(req, res, "/api/upload/image"));
+  apiRouter.delete("/upload/image", (req, res) => proxyRequest(req, res, "/api/upload/image"));
+  apiRouter.post("/upload/direct-token", (req, res) => proxyRequest(req, res, "/api/upload/direct-token"));
+  apiRouter.post("/upload/commit", (req, res) => proxyRequest(req, res, "/api/upload/commit"));
 
   app.use("/api", apiRouter);
 

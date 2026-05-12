@@ -284,20 +284,31 @@ export default function App() {
             if (generatedImageBase64) {
                currentResults[i] = `data:${generatedMime};base64,${generatedImageBase64}`;
                
-               // Consume points if back image (index 1) successful
-               if (i === 1 && saasInfo) {
-                 try {
-                   fetch('/api/tool/consume', {
-                     method: "POST",
-                     headers: { "Content-Type": "application/json" },
-                     body: JSON.stringify({ userId: saasInfo.userId, toolId: saasInfo.toolId })
-                   }).then(res => res.json()).then(d => {
-                     if (d.success !== false && d.data?.currentIntegral !== undefined) {
-                       setIntegral(d.data.currentIntegral);
-                     }
-                   }).catch(e => console.warn("Consume error", e));
-                 } catch(err) {}
-               }
+                // Consume points and upload image if successful
+                if (saasInfo) {
+                  try {
+                    fetch('/api/tool/consume', {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ userId: saasInfo.userId, toolId: saasInfo.toolId })
+                    }).then(res => res.json()).then(d => {
+                      if (d.success !== false && d.data?.currentIntegral !== undefined) {
+                        setIntegral(d.data.currentIntegral);
+                        
+                        // Upload the result image to SaaS
+                        fetch('/api/upload/image', {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                             base64: currentResults[i],
+                             userId: saasInfo.userId,
+                             source: "result"
+                          })
+                        }).catch(e => console.warn("Upload result error", e));
+                      }
+                    }).catch(e => console.warn("Consume error", e));
+                  } catch(err) {}
+                }
             }
         } catch (e) {
             console.error(`Error generating image ${i}:`, e);
