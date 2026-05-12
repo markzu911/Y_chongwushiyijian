@@ -68,6 +68,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [integral, setIntegral] = useState<number | null>(null);
   const [saasInfo, setSaasInfo] = useState<{userId: string, toolId: string, context?: string, prompt?: string[]} | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   useEffect(() => {
     const initSaaS = async (info: {userId: string, toolId: string}) => {
@@ -321,13 +322,7 @@ export default function App() {
   };
 
   return (
-    <div className="flex h-[100dvh] w-full bg-bg-base text-text-main font-sans overflow-hidden mx-auto max-w-[1400px] relative">
-      {integral !== null && (
-        <div className="absolute top-6 right-6 bg-accent text-white px-4 py-2 flex items-center gap-2 rounded-full text-[13px] font-[600] shadow-sm z-50 transition-all">
-          <Sparkles className="w-4 h-4" />
-          积分余额: {integral}
-        </div>
-      )}
+    <div className="flex h-[100dvh] w-full bg-bg-base text-text-main font-sans overflow-hidden mx-auto max-w-[1400px] relative flex-col md:flex-row">
       <aside className="w-[320px] bg-sidebar border-r border-border p-6 flex flex-col gap-6 overflow-y-auto shrink-0 relative z-10 hidden md:flex">
         <div className="text-[22px] font-[700] text-accent tracking-[-1px] items-center gap-2 flex uppercase">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -337,9 +332,19 @@ export default function App() {
           试衣间
         </div>
 
+        {integral !== null && (
+          <div className="bg-accent/10 border border-accent/20 text-accent px-4 py-3 rounded-xl flex items-center gap-2 mb-2">
+            <Sparkles className="w-4 h-4" />
+            <div className="flex flex-col">
+              <span className="text-[10px] uppercase font-bold opacity-70">积分余额</span>
+              <span className="text-[16px] font-bold leading-tight">{integral}</span>
+            </div>
+          </div>
+        )}
+
         <div className="flex flex-col gap-3">
           {error && (
-            <div className="mt-2 p-3 bg-red-50 text-red-600 rounded-xl flex gap-2 text-[12px] border border-red-100">
+            <div className="p-3 bg-red-50 text-red-600 rounded-xl flex gap-2 text-[12px] border border-red-100">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
               <p>{error}</p>
             </div>
@@ -380,19 +385,34 @@ export default function App() {
         </button>
       </aside>
 
-      <main className="flex-1 p-8 flex flex-col gap-8 overflow-y-auto w-full md:w-auto h-full pb-32 md:pb-8">
-        <div className="md:hidden text-[22px] font-[700] text-accent tracking-[-1px] items-center gap-2 mb-4 flex uppercase">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M10 5.172a2 2 0 0 0-1.414.586l-1.172 1.172A2 2 0 0 1 6 7.5H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-10a2 2 0 0 0-2-2h-2a2 2 0 0 1-1.414-.586l-1.172-1.172A2 2 0 0 0 14 5.172h-4Z"/>
-            <circle cx="12" cy="13" r="3"/>
-          </svg>
-          试衣间
+      <main className="flex-1 p-4 md:p-8 flex flex-col gap-6 md:gap-8 overflow-y-auto h-full scroll-smooth">
+        <div className="md:hidden flex items-center justify-between gap-4 py-3 border-b border-border/80 mb-2">
+          <div className="text-[20px] font-[700] text-accent tracking-[-1px] items-center gap-2 flex uppercase">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M10 5.172a2 2 0 0 0-1.414.586l-1.172 1.172A2 2 0 0 1 6 7.5H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-10a2 2 0 0 0-2-2h-2a2 2 0 0 1-1.414-.586l-1.172-1.172A2 2 0 0 0 14 5.172h-4Z"/>
+              <circle cx="12" cy="13" r="3"/>
+            </svg>
+            试衣间
+          </div>
+          {integral !== null && (
+            <div className="bg-accent text-white px-3.5 py-1.5 rounded-xl text-[12px] font-[600] shadow-sm flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" />
+              {integral}
+            </div>
+          )}
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-[24px] lg:h-[240px] shrink-0">
+        {error && (
+          <div className="md:hidden p-3 bg-red-50 text-red-600 rounded-xl flex gap-2 text-[12px] border border-red-100 mb-2">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <p>{error}</p>
+          </div>
+        )}
+
+        <div className="flex flex-col sm:flex-row gap-4 md:gap-[24px] shrink-0 min-h-[180px] sm:h-[240px]">
           <UploadBox 
             title="宠物照片" 
-            desc="支持 JPG, PNG, WebP, HEIC (最大 20MB)"
+            desc="JPG, PNG, WebP, HEIC"
             icon="🐕"
             image={petImage} 
             onUpload={(f) => handleImageUpload(f, 'pet')} 
@@ -400,7 +420,7 @@ export default function App() {
           />
           <UploadBox 
             title="服装照片" 
-            desc="支持 JPG, PNG, WebP, HEIC (最大 20MB)"
+            desc="JPG, PNG, WebP, HEIC"
             icon="👕"
             image={clothImage} 
             onUpload={(f) => handleImageUpload(f, 'cloth')} 
@@ -412,18 +432,18 @@ export default function App() {
           <div className="text-[11px] uppercase tracking-[2px] text-text-muted font-[700]">结果预览</div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-[24px] flex-1 min-h-[350px]">
-            <ResultCard title="正面视角" badge="正面" desc="正面效果" active={isGenerating && !results[0]} src={results[0]} icon={isGenerating && !results[0] ? <RefreshCw className="w-6 h-6 animate-spin text-black"/> : <ImageIcon className="w-10 h-10 opacity-10" />} />
-            <ResultCard title="背面视角" badge="背面" desc="背面效果" active={isGenerating && !results[1]} src={results[1]} icon={isGenerating && !results[1] ? <RefreshCw className="w-6 h-6 animate-spin text-black"/> : <ImageIcon className="w-10 h-10 opacity-10" />} />
+            <ResultCard title="正面视角" badge="正面" desc="正面效果" active={isGenerating && !results[0]} src={results[0]} onPreview={() => setPreviewImage(results[0] || null)} icon={isGenerating && !results[0] ? <RefreshCw className="w-6 h-6 animate-spin text-black"/> : <ImageIcon className="w-10 h-10 opacity-10" />} />
+            <ResultCard title="背面视角" badge="背面" desc="背面效果" active={isGenerating && !results[1]} src={results[1]} onPreview={() => setPreviewImage(results[1] || null)} icon={isGenerating && !results[1] ? <RefreshCw className="w-6 h-6 animate-spin text-black"/> : <ImageIcon className="w-10 h-10 opacity-10" />} />
           </div>
         </div>
 
-        <div className="md:hidden flex flex-col gap-6 mt-6">
+        <div className="md:hidden flex flex-col gap-6 mt-6 pb-20">
            <div className="flex flex-col gap-3">
-             <div className="text-[11px] uppercase tracking-[2px] text-text-muted font-[700]">分辨率</div>
+             <div className="text-[11px] uppercase tracking-[2px] text-text-muted font-[700]">输出设置</div>
              <div className="grid grid-cols-3 gap-2">
               {(["1K", "2K", "4K"] as ImageSize[]).map(res => (
                 <button key={`m-${res}`} onClick={() => setResolution(res)}
-                  className={`border bg-white p-[8px] rounded-xl text-[12px] text-center cursor-pointer transition-all ${resolution === res ? 'border-accent bg-accent text-white font-[600]' : 'border-border text-text-main hover:border-accent'}`}>
+                  className={`border p-[8px] rounded-xl text-[12px] text-center cursor-pointer transition-all active:scale-95 ${resolution === res ? 'border-accent bg-accent text-white font-[600]' : 'border-border bg-white text-text-main hover:border-accent'}`}>
                   {res}
                 </button>
               ))}
@@ -431,11 +451,11 @@ export default function App() {
           </div>
 
           <div className="flex flex-col gap-3">
-             <div className="text-[11px] uppercase tracking-[2px] text-text-muted font-[700]">比例</div>
+             <div className="text-[11px] uppercase tracking-[2px] text-text-muted font-[700]">画面比例</div>
              <div className="grid grid-cols-3 gap-2">
               {(["1:1", "3:4", "4:3"] as AspectRatio[]).map(ar => (
                 <button key={`mar-${ar}`} onClick={() => setAspectRatio(ar)}
-                  className={`border bg-white p-[10px] rounded-xl text-[12px] text-center cursor-pointer transition-all ${aspectRatio === ar ? 'border-accent bg-accent text-white font-[600]' : 'border-border text-text-main hover:border-accent'}`}>
+                  className={`border p-[10px] rounded-xl text-[12px] text-center cursor-pointer transition-all active:scale-95 ${aspectRatio === ar ? 'border-accent bg-accent text-white font-[600]' : 'border-border bg-white text-text-main hover:border-accent'}`}>
                   {ar}
                 </button>
               ))}
@@ -445,14 +465,39 @@ export default function App() {
           <button 
             onClick={handleGenerate} 
             disabled={!petImage || !clothImage || isGenerating}
-            className="w-full bg-accent text-white border border-accent p-[16px] rounded-xl text-[14px] font-[700] uppercase tracking-[1px] cursor-pointer transition-all hover:bg-accent-hover disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 shadow-xl"
+            className="w-full bg-accent text-white border border-accent p-4 rounded-2xl text-[15px] font-[700] uppercase tracking-[1px] cursor-pointer transition-all active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-3 mt-2 shadow-lg shadow-accent/20"
           >
-            {isGenerating && <RefreshCw className="animate-spin w-4 h-4" />}
-            {isGenerating ? '生成中' : '一键生成 写真'}
+            {isGenerating && <RefreshCw className="animate-spin w-5 h-5" />}
+            {isGenerating ? '生成中...' : '一键生成'}
           </button>
         </div>
 
       </main>
+
+      {/* Preview Modal */}
+      {previewImage && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 md:p-8 animate-in fade-in duration-200"
+          onClick={() => setPreviewImage(null)}
+        >
+          <div className="relative max-w-full max-h-full flex items-center justify-center">
+            <img 
+              src={previewImage} 
+              alt="Preview" 
+              className="max-w-full max-h-full object-contain rounded-lg shadow-2xl animate-in zoom-in-95 duration-300" 
+              onClick={(e) => e.stopPropagation()}
+            />
+            <button 
+              className="absolute -top-12 right-0 md:-right-12 md:top-0 text-white hover:text-accent-hover transition-colors p-2"
+              onClick={() => setPreviewImage(null)}
+            >
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -505,8 +550,9 @@ function UploadBox({ title, desc, icon, image, onUpload, onRemove }: { title: st
   );
 }
 
-function ResultCard({ title, badge, desc, active, src, icon }: { title: string, badge: string, desc: string, active: boolean, src?: string | null, icon: React.ReactNode }) {
-  const handleDownload = () => {
+function ResultCard({ title, badge, desc, active, src, icon, onPreview }: { title: string, badge: string, desc: string, active: boolean, src?: string | null, icon: React.ReactNode, onPreview: () => void }) {
+  const handleDownload = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (!src) return;
     const a = document.createElement('a');
     a.href = src;
@@ -517,7 +563,10 @@ function ResultCard({ title, badge, desc, active, src, icon }: { title: string, 
   };
 
   return (
-    <div className="bg-card rounded-2xl border border-border flex flex-col overflow-hidden h-[350px] lg:h-auto lg:min-h-[350px] group relative transition-all hover:border-accent shadow-sm">
+    <div 
+      className={`bg-card rounded-2xl border border-border flex flex-col overflow-hidden h-[350px] lg:h-auto lg:min-h-[350px] group relative transition-all shadow-sm ${src ? 'cursor-zoom-in hover:border-accent' : ''}`}
+      onClick={src ? onPreview : undefined}
+    >
       <div className="flex-1 bg-tag flex items-center justify-center relative">
         <span className="absolute top-[12px] left-[12px] bg-accent text-white px-[12px] py-[4px] rounded-full text-[10px] font-[700] tracking-[1px] z-10 uppercase shadow-sm">
           {badge}
