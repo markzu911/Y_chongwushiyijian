@@ -319,7 +319,8 @@ export default function App() {
             },
             config: {
                 imageConfig: {
-                    aspectRatio: aspectRatio
+                    aspectRatio: aspectRatio,
+                    imageSize: resolution
                 }
             }
             });
