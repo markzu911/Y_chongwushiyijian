@@ -55,6 +55,60 @@ function parseBase64(dataUrl: string): [string, string] {
   return [matches[1], matches[2]];
 }
 
+const saveResultToSaaS = async (base64: string, userId: string, toolId: string) => {
+  try {
+    const [mime, b64Data] = parseBase64(base64);
+    const byteCharacters = atob(b64Data);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: mime });
+
+    // 1. 获取直传 Token
+    const tokenRes = await fetch('/api/upload/direct-token', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId,
+        toolId,
+        source: "result",
+        mimeType: mime,
+        fileName: "result.png",
+        fileSize: blob.size
+      })
+    });
+    const token = await tokenRes.json();
+    if (!token.success) throw new Error(token.error || "Token failed");
+
+    // 2. 直接 PUT 到 OSS
+    const uploadRes = await fetch(token.uploadUrl, {
+      method: "PUT",
+      headers: { "Content-Type": mime },
+      body: blob
+    });
+    if (!uploadRes.ok) throw new Error(`OSS Upload failure: ${uploadRes.status}`);
+
+    // 3. Commit 入库
+    const commitRes = await fetch('/api/upload/commit', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId,
+        toolId,
+        source: "result",
+        objectKey: token.objectKey,
+        fileSize: blob.size
+      })
+    });
+    const commit = await commitRes.json();
+    console.log("SaaS Gallery Commit:", commit.success ? "Success" : "Failed", commit.recordId || "");
+  } catch (e) {
+    console.error("Gallery sync failed:", e);
+  }
+};
+
 type ImageSize = "1K" | "2K" | "4K";
 type AspectRatio = "1:1" | "3:4" | "4:3";
 
@@ -247,6 +301,7 @@ export default function App() {
       const currentResults: (string | null)[] = [null, null];
       setResults([...currentResults]);
 
+      let consumedForThisSet = false;
       let hasGenerationError = false;
 
       for (let i = 0; i < prompts.length; i++) {
@@ -285,32 +340,34 @@ export default function App() {
                const finalBase64 = `data:${generatedMime};base64,${generatedImageBase64}`;
                currentResults[i] = finalBase64;
                
-               // Upload to SaaS gallery if generating for real user
+               // SaaS Standard Sequence: AI Success -> Consume -> Gallery Save
                if (saasInfo && saasInfo.userId !== "test_user") {
-                 fetch('/api/upload/image', {
-                   method: "POST",
-                   headers: { "Content-Type": "application/json" },
-                   body: JSON.stringify({
-                     base64: finalBase64,
-                     userId: saasInfo.userId,
-                     source: "result"
-                   })
-                 }).catch(e => console.warn("Upload result image error:", e));
-               }
-
-               // Consume points if back image (index 1) successful
-               if (i === 1 && saasInfo) {
                  try {
-                   fetch('/api/tool/consume', {
-                     method: "POST",
-                     headers: { "Content-Type": "application/json" },
-                     body: JSON.stringify({ userId: saasInfo.userId, toolId: saasInfo.toolId })
-                   }).then(res => res.json()).then(d => {
-                     if (d.success !== false && d.data?.currentIntegral !== undefined) {
-                       setIntegral(d.data.currentIntegral);
+                   // 1. Consume once per generation set
+                   if (!consumedForThisSet) {
+                     const cRes = await fetch('/api/tool/consume', {
+                       method: "POST",
+                       headers: { "Content-Type": "application/json" },
+                       body: JSON.stringify({ userId: saasInfo.userId, toolId: saasInfo.toolId })
+                     });
+                     const cData = await cRes.json();
+                     if (cData.success) {
+                        consumedForThisSet = true;
+                        if (cData.data?.currentIntegral !== undefined) {
+                          setIntegral(cData.data.currentIntegral);
+                        }
+                     } else {
+                       console.warn("Integral consume failed, image might not be saved to gallery");
                      }
-                   }).catch(e => console.warn("Consume error", e));
-                 } catch(err) {}
+                   }
+
+                   // 2. Standard direct-upload flow to gallery if consumed success
+                   if (consumedForThisSet) {
+                     saveResultToSaaS(finalBase64, saasInfo.userId, saasInfo.toolId);
+                   }
+                 } catch (e) {
+                   console.error("SaaS gallery orchestration error:", e);
+                 }
                }
             }
         } catch (e) {
