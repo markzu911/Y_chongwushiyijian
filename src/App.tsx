@@ -286,15 +286,18 @@ export default function App() {
 
       const unifiedEnvironment = "ENVIRONMENT: The pet is sitting in a warm, cozy, and inviting indoor home setting, resting on a soft plush beige blanket or cushion. The beautifully blurred background features subtle warm wooden textures and soft glowing ambient light. Highly detailed, soft realistic warm indoor lighting.";
       const exactIdentity = "ABSOLUTE CRITICAL INSTRUCTION: THIS IS A VIRTUAL TRY-ON TASK. The pet in the final image MUST BE A PERFECT 100% COPY of the 'Reference Pet Image'. The pet's face, fur pattern, specific fur colors, spots, eye shape, eye color, nose shape, and bodily proportions must be 100% IDENTICAL. It must look exactly like the uploaded pet.";
-      const exactClothing = "CRITICAL CLOTHING INSTRUCTION: The 'Reference Clothing Image' shows the DECORATIVE BACK SIDE (the part that covers the spine) of the garment. This side usually contains leash rings (D-rings), large embroidered patches, or main decorations. The FRONT SIDE (belly/chest area) is typically simple and plain fabric. You MUST accurately represent the texture, material, and colors from the reference.";
+      const exactClothing = "CRITICAL CLOTHING INSTRUCTION: Carefully analyze the 'Reference Clothing Image'. " +
+        "1. BUTTONS & CLOSURES: If the reference clothing shows buttons, snaps, zippers, or open plackets, these are closures and MUST go on the FRONT (chest/belly) of the pet. The BACK (spine) of the pet must NOT have any buttons, snaps, zippers, or opening seams; it should be seamless, plain solid fabric. " +
+        "2. DECORATIVE ELEMENTS: If the reference shows leash rings (D-rings), large embroidered patches, wings, or prints with no opening seam/buttons, these belong on the BACK (spine) of the pet, and the front (belly) should be plain. " +
+        "3. Fabric Texture: Keep the exact same fabric texture, color, knit pattern, and material feel (e.g., knit, plush, or fleece).";
       
       const saasContextStr = saasInfo?.context ? ` ${saasInfo.context}` : "";
       const saasKeywordsStr = (saasInfo?.prompt && saasInfo.prompt.length > 0) ? ` ${saasInfo.prompt.join(',')}` : "";
       const additionalConstraints = saasContextStr + saasKeywordsStr;
 
       const prompts = [
-         `${exactIdentity} ${exactClothing} TASK: Create a detailed photography. VIEW: FRONT VIEW. The pet is sitting facing the camera. In this view, we see the UNDERSIDE/BELLY side of the clothing. This part MUST be SIMPLE and PLAIN. DO NOT put the metal leash rings or the main large patches on the chest. The chest area should look like the simple underside of a vest. ${unifiedEnvironment}${additionalConstraints}`,
-         `${exactIdentity} ${exactClothing} TASK: Create a detailed photography. VIEW: BACK VIEW. The pet is sitting facing AWAY from the camera. In this view, we see the DECORATIVE BACK/SPINE side of the clothing. This side MUST be a 1:1 match to the 'Reference Clothing Image'. It MUST show the metal leash ring, the large embroidery, and all details from the reference placed correctly on the spine. ${unifiedEnvironment}${additionalConstraints}`
+         `${exactIdentity} ${exactClothing} TASK: Create a detailed photography. VIEW: FRONT VIEW. The pet is sitting facing the camera. This view MUST show the front chest and belly of the pet. If the 'Reference Clothing Image' has buttons, snaps, or fasteners, they MUST appear here on the chest/belly opening. The clothes should wrap around the pet's front chest naturally with the button placket visible. ${unifiedEnvironment}${additionalConstraints}`,
+         `${exactIdentity} ${exactClothing} TASK: Create a detailed photography. VIEW: BACK VIEW. The pet is sitting facing AWAY from the camera. This view MUST show the back/spine of the pet. The back of the garment MUST be a continuous, solid fabric piece with absolutely NO buttons, snaps, zippers, seams, or opening plackets. It should be completely smooth on the spine, showing only the plain fabric texture/knit pattern. ${unifiedEnvironment}${additionalConstraints}`
       ];
 
       // Initialize results with nulls so the loading indicators appear for all cards
